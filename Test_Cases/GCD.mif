@@ -1,0 +1,29 @@
+-- Student: Harry Zarcadoolas, Section: 11091, Course: EEL4712C
+-- GCD Program: Calculate GCD of the values stored in InPort0 and InPort1 and send result to Outport
+Depth = 256;
+Width = 32;
+Address_radix = hex;
+Data_radix = hex;
+% Program RAM Data %
+Content
+  Begin
+        -- instructions used: lw, beq, sltu, bne, subu, j, sw
+
+00 : 8C10FFF8; -- lw $s0, FFF8($zero)    // load word from InPort0 to $s0/r16
+01 : 8C11FFFC; -- lw $s1, FFFC($zero)    // Load word from the InPort1 to $s1/R17
+--                                                              * LOOP *
+02 : 12300006; -- beq $s1, $s0, [EXIT]   // loop condition check, if $s1 == $s0 exit loop
+03 : 0230402B; -- sltu $t0, $s1, $s0     // if $s1 < %s0, $t0 = 1; else $t0=0, $t/r8
+
+04 : 15000002; -- bne $t0, $zero, [SKIP] // if $t0 != 0, branch to SKIP
+05 : 02308823; -- subu $s1, $s1, $s0     // $s1 = $s1 - $s0
+06 : 08000002; -- j LOOP
+--                                                              * SKIP *
+07 : 02118023; -- subu $s0, $s0, $s1
+08 : 08000002; -- j LOOP
+--                                                              * EXIT *
+09 : AC10FFFC; -- sw $s0, FFFC($zero)    // store $s1 to the OutPort
+--                                                              * DONE *
+0A : 0800000A; -- j DONE                 // infinite loop when finished
+
+End;
